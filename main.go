@@ -1,3 +1,7 @@
+/**
+* Use this function to build your own environment
+*
+**/
 package main
 
 import (
@@ -14,7 +18,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func main() {
+func mainDevelopment() {
 	db := app.NewDatabase()
 	e := echo.New()
 	validate := validator.New()
@@ -51,31 +55,3 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Start(":3000")
 }
-
-// const defaultPort = "8080"
-
-// func main() {
-// 	database.Connect()
-
-// 	port := os.Getenv("PORT")
-// 	if port == "" {
-// 		port = defaultPort
-// 	}
-
-// srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
-
-// 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-// 	http.Handle("/query", srv)
-
-// 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-// 	log.Fatal(http.ListenAndServe(":"+port, nil))
-// }
-// e.POST("/query", func(c echo.Context) error {
-// 	graphqlHandler.ServeHTTP(c.Response(), c.Request())
-// 	return nil
-// })
-
-// e.GET("/playground", func(c echo.Context) error {
-// 	playgroundHandler.ServeHTTP(c.Response(), c.Request())
-// 	return nil
-// })
