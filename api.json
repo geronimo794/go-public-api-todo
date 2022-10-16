@@ -308,20 +308,21 @@
 		},
 		"parameters": {
 			"id": {
-				"name": "Id",
+				"name": "id",
 				"description": "Primary key identifier of main data",
 				"in": "path",
 				"required": true,
-				"allowEmptyValue": false,
 				"schema": {
 					"type": "integer",
 					"nullable": false,
 					"minimum": 1,
+					"maximum": 1000000000,
+					"format": "int64",
 					"maxLength": 100
 				}
 			},
 			"isDone": {
-				"name": "Is done parameter",
+				"name": "isDone",
 				"description": "Additional parameter to get the is_done status of the todo data",
 				"in": "query",
 				"required": false,
@@ -332,14 +333,12 @@
 				}
 			},
 			"keyword": {
-				"name": "Keyword",
+				"name": "keyword",
 				"description": "General input keyword for searching",
 				"in": "query",
 				"required": false,
-				"allowEmptyValue": true,
 				"schema": {
 					"type": "string",
-					"default": "",
 					"nullable": true,
 					"minLength": 3,
 					"maxLength": 100
@@ -359,13 +358,15 @@
 		"schemas": {
 			"todo": {
 				"type": "object",
+				"additionalProperties": false,
 				"properties": {
 					"id": {
 						"type": "integer"
 					},
 					"name": {
 						"type": "string",
-						"nullable": false
+						"nullable": false,
+						"minLength": 1
 					},
 					"priority": {
 						"type": "string",
@@ -385,6 +386,7 @@
 			},
 			"inputTodo": {
 				"type": "object",
+				"additionalProperties": false,
 				"required": [
 					"name",
 					"priority"
@@ -411,6 +413,7 @@
 			},
 			"inputAuth": {
 				"type": "object",
+				"additionalProperties": false,
 				"required": [
 					"username",
 					"password"
@@ -430,6 +433,7 @@
 			},
 			"responseNotFound": {
 				"type": "object",
+				"additionalProperties": false,
 				"properties": {
 					"code": {
 						"type": "integer",
@@ -451,6 +455,7 @@
 			},
 			"responseTodo": {
 				"type": "object",
+				"additionalProperties": false,
 				"properties": {
 					"code": {
 						"type": "integer",
@@ -471,6 +476,7 @@
 			},
 			"responseTodoListData": {
 				"type": "object",
+				"additionalProperties": false,
 				"properties": {
 					"code": {
 						"type": "integer",
@@ -495,6 +501,7 @@
 			},
 			"responseAuthSuccess": {
 				"type": "object",
+				"additionalProperties": false,
 				"properties": {
 					"code": {
 						"type": "integer",
@@ -522,6 +529,7 @@
 			},
 			"responseAuthFailed": {
 				"type": "object",
+				"additionalProperties": false,
 				"properties": {
 					"code": {
 						"type": "integer",
@@ -545,6 +553,7 @@
 			},
 			"responseMessageOnly": {
 				"type": "object",
+				"additionalProperties": false,
 				"properties": {
 					"message": {
 						"type": "string",
