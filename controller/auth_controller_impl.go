@@ -44,6 +44,6 @@ func (controller *AuthControllerImpl) Authenticate(e echo.Context) error {
 	// Create repsponse
 	response_data := controller.AuthService.GenerateToken(e.Request().Context(), request_data)
 
-	return helper.BuildJsonResponse(e, http.StatusCreated, response_data, nil)
+	return helper.BuildJsonResponse(e, http.StatusOK, response_data, nil)
 
 }

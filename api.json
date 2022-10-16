@@ -15,18 +15,12 @@
 	},
 	"servers": [
 		{
-			"url": "{endpoint}",
-			"description": "Simple To Do List API Endpoint",
-			"variables": {
-				"endpoint": {
-					"default": "http://localhost:8080",
-					"description": "URL API Endpoint",
-					"enum": [
-						"http://localhost:3000",
-						"https://todoapi.rozik.in"
-					]
-				}
-			}
+			"url": "https://todoapi.rozik.in",
+			"description": "Public Todo API Endpoint"
+		},
+		{
+			"url": "http://localhost:3000",
+			"description": "Local development API Endpoint"
 		}
 	],
 	"externalDocs": {
@@ -34,8 +28,48 @@
 		"url": "https://blog.rozik.in/open-api-simple-todo-list"
 	},
 	"paths": {
+		"/login": {
+			"post": {
+				"tags": [
+					"Authentification"
+				],
+				"description": "Get token bearer process",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"$ref": "#/components/schemas/inputAuth"
+							},
+							"examples": {
+								"default": {
+									"description": "Default auth",
+									"value": {
+										"username": "admin",
+										"password": "admin"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/authSuccess"
+					},
+					"401": {
+						"$ref": "#/components/responses/authFailed"
+					}
+				}
+			}
+		},
 		"/todo": {
 			"get": {
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
 				"tags": [
 					"Get Data"
 				],
@@ -43,10 +77,10 @@
 				"description": "Get all todo list data with simple filter operation",
 				"parameters": [
 					{
-						"$ref": "#/components/parameters/param-status"
+						"$ref": "#/components/parameters/isDone"
 					},
 					{
-						"$ref": "#/components/parameters/param-keyword"
+						"$ref": "#/components/parameters/keyword"
 					}
 				],
 				"responses": {
@@ -55,22 +89,30 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/response-todo-list-data"
+									"$ref": "#/components/schemas/responseTodoListData"
 								},
 								"examples": {
 									"success": {
-										"$ref": "#/components/examples/response-todo-list-200"
+										"$ref": "#/components/examples/responseTodoList200"
 									}
 								}
 							}
 						}
 					},
 					"404": {
-						"$ref": "#/components/responses/404-data-not-found-response"
+						"$ref": "#/components/responses/dataNotFound"
+					},
+					"400":{
+						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
 			},
 			"post": {
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
 				"tags": [
 					"Create Data"
 				],
@@ -81,7 +123,7 @@
 					"content": {
 						"multipart/form-data": {
 							"schema": {
-								"$ref": "#/components/schemas/request-todo-data"
+								"$ref": "#/components/schemas/inputTodo"
 							},
 							"examples": {
 								"kerja": {
@@ -91,7 +133,7 @@
 										"priority": "high"
 									}
 								},
-								"belanaja": {
+								"belanja": {
 									"description": "Example create to do data with belanja",
 									"value": {
 										"name": "Belanja makanan bulanan",
@@ -104,13 +146,21 @@
 				},
 				"responses": {
 					"200": {
-						"$ref": "#/components/responses/200-single-data-response"
+						"$ref": "#/components/responses/singleData"
+					},
+					"400":{
+						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
 			}
 		},
 		"/todo/{id}": {
 			"get": {
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
 				"tags": [
 					"Get Data"
 				],
@@ -118,19 +168,27 @@
 				"description": "Get single todo list data by spesific Id",
 				"parameters": [
 					{
-						"$ref": "#/components/parameters/param-id"
+						"$ref": "#/components/parameters/id"
 					}
 				],
 				"responses": {
 					"200": {
-						"$ref": "#/components/responses/200-single-data-response"
+						"$ref": "#/components/responses/singleData"
 					},
 					"404": {
-						"$ref": "#/components/responses/404-data-not-found-response"
+						"$ref": "#/components/responses/dataNotFound"
+					},
+					"400":{
+						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
 			},
 			"delete": {
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
 				"tags": [
 					"Delete Data"
 				],
@@ -138,19 +196,27 @@
 				"description": "Delete single todo list data",
 				"parameters": [
 					{
-						"$ref": "#/components/parameters/param-id"
+						"$ref": "#/components/parameters/id"
 					}
 				],
 				"responses": {
 					"200": {
-						"$ref": "#/components/responses/200-single-data-response"
+						"$ref": "#/components/responses/singleData"
 					},
 					"404": {
-						"$ref": "#/components/responses/404-data-not-found-response"
+						"$ref": "#/components/responses/dataNotFound"
+					},
+					"400":{
+						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
 			},
 			"put": {
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
 				"tags": [
 					"Modify Data"
 				],
@@ -158,7 +224,7 @@
 				"description": "Edit text of todo data",
 				"parameters": [
 					{
-						"$ref": "#/components/parameters/param-id"
+						"$ref": "#/components/parameters/id"
 					}
 				],
 				"requestBody": {
@@ -166,7 +232,7 @@
 					"content": {
 						"multipart/form-data": {
 							"schema": {
-								"$ref": "#/components/schemas/request-todo-data"
+								"$ref": "#/components/schemas/inputTodo"
 							},
 							"examples": {
 								"kerja": {
@@ -176,7 +242,7 @@
 										"priority": "high"
 									}
 								},
-								"belanaja": {
+								"belanja": {
 									"description": "Example create to do data with belanja",
 									"value": {
 										"name": "Belanja makanan bulanan",
@@ -189,16 +255,24 @@
 				},
 				"responses": {
 					"200": {
-						"$ref": "#/components/responses/200-single-data-response"
+						"$ref": "#/components/responses/singleData"
 					},
 					"404": {
-						"$ref": "#/components/responses/404-data-not-found-response"
+						"$ref": "#/components/responses/dataNotFound"
+					},
+					"400":{
+						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
 			}
 		},
 		"/todo/{id}/reverse-status": {
 			"put": {
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
 				"tags": [
 					"Modify Data"
 				],
@@ -206,25 +280,36 @@
 				"description": "Change status of the todo data. If status 1 it will be 0, if status 0 it will be 1.",
 				"parameters": [
 					{
-						"$ref": "#/components/parameters/param-id"
+						"$ref": "#/components/parameters/id"
 					}
 				],
 				"responses": {
 					"200": {
-						"$ref": "#/components/responses/200-single-data-response"
+						"$ref": "#/components/responses/singleData"
 					},
 					"404": {
-						"$ref": "#/components/responses/404-data-not-found-response"
+						"$ref": "#/components/responses/dataNotFound"
+					},
+					"400":{
+						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
 			}
 		}
 	},
 	"components": {
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Every action on this API need JWT token to be authorize"
+			}
+		},
 		"parameters": {
-			"param-id": {
-				"name": "id",
-				"description": "Identifier of data",
+			"id": {
+				"name": "Id",
+				"description": "Primary key identifier of main data",
 				"in": "path",
 				"required": true,
 				"allowEmptyValue": false,
@@ -235,26 +320,20 @@
 					"maxLength": 100
 				}
 			},
-			"param-status": {
-				"name": "status",
-				"description": "Status of the to do data",
+			"isDone": {
+				"name": "Is done parameter",
+				"description": "Additional parameter to get the is_done status of the todo data",
 				"in": "query",
 				"required": false,
 				"allowEmptyValue": true,
 				"schema": {
-					"type": "integer",
-					"default": "-1",
-					"enum": [
-						"-1",
-						"0",
-						"1"
-					],
+					"type": "boolean",
 					"nullable": true
 				}
 			},
-			"param-keyword": {
-				"name": "keyword",
-				"description": "Parameter keyword for searching",
+			"keyword": {
+				"name": "Keyword",
+				"description": "General input keyword for searching",
 				"in": "query",
 				"required": false,
 				"allowEmptyValue": true,
@@ -278,29 +357,33 @@
 			}
 		},
 		"schemas": {
-			"todo-data": {
+			"todo": {
 				"type": "object",
 				"properties": {
 					"id": {
 						"type": "integer"
 					},
 					"name": {
-						"type": "string"
+						"type": "string",
+						"nullable": false
 					},
 					"priority": {
-						"type": "string"
-					},
-					"status": {
-						"type": "integer",
+						"type": "string",
 						"enum": [
-							0,
-							1
+							"low",
+							"medium",
+							"high"
 						],
-						"description": "If checked is 1, if not checked 0"
+						"nullable": false
+					},
+					"is_done": {
+						"type": "boolean",
+						"description": "The is_done status of the todo data",
+						"nullable": false
 					}
 				}
 			},
-			"request-todo-data": {
+			"inputTodo": {
 				"type": "object",
 				"required": [
 					"name",
@@ -325,8 +408,27 @@
 						"nullable": false
 					}
 				}
-			},			
-			"response-standard": {
+			},
+			"inputAuth": {
+				"type": "object",
+				"required": [
+					"username",
+					"password"
+				],
+				"properties": {
+					"username": {
+						"type": "string",
+						"nullable": false,
+						"example": "admin"
+					},
+					"password": {
+						"type": "string",
+						"nullable": false,
+						"example": "admin"
+					}
+				}
+			},
+			"responseNotFound": {
 				"type": "object",
 				"properties": {
 					"code": {
@@ -338,17 +440,36 @@
 						"example": "OK"
 					},
 					"data": {
-						"type": "array",
+						"type": "object",
 						"nullable": true
 					},
 					"errors": {
-						"type": "array",
+						"type": "object",
 						"nullable": true
 					}
 				}
 			},
-
-			"response-todo-list-data": {
+			"responseTodo": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"example": 200
+					},
+					"message": {
+						"type": "string",
+						"example": "OK"
+					},
+					"data": {
+						"$ref": "#/components/schemas/todo"
+					},
+					"errors": {
+						"type": "object",
+						"nullable": true
+					}
+				}
+			},
+			"responseTodoListData": {
 				"type": "object",
 				"properties": {
 					"code": {
@@ -363,16 +484,16 @@
 						"type": "array",
 						"nullable": true,
 						"items": {
-							"$ref": "#/components/schemas/todo-data"
+							"$ref": "#/components/schemas/todo"
 						}
 					},
 					"errors": {
-						"type": "array",
+						"type": "object",
 						"nullable": true
 					}
 				}
 			},
-			"response-todo-data": {
+			"responseAuthSuccess": {
 				"type": "object",
 				"properties": {
 					"code": {
@@ -384,18 +505,72 @@
 						"example": "OK"
 					},
 					"data": {
-						"$ref": "#/components/schemas/todo-data"
+						"type": "object",
+						"nullable": false,
+						"properties": {
+							"token": {
+								"type": "string",
+								"example": "aaa.bbb.ccc"
+							}
+						}
 					},
 					"errors": {
-						"type": "array",
+						"type": "object",
 						"nullable": true
+					}
+				}
+			},
+			"responseAuthFailed": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"example": 401
+					},
+					"message": {
+						"type": "string",
+						"example": "Unauthorized"
+					},
+					"data": {
+						"type": "object",
+						"nullable": true,
+						"example": null
+					},
+					"errors": {
+						"type": "object",
+						"nullable": true,
+						"example": null
+					}
+				}
+			},
+			"responseMessageOnly": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string",
+						"example": "missing or malformed jwt"
 					}
 				}
 			}
 		},
 		"examples": {
-			"response-404": {
-				"description": "Response data if data not available",
+			"response400": {
+				"description": "Invalid JWT Token",
+				"value": {
+					"message": "missing or malformed jwt"
+				}
+			},
+			"responseAuth401": {
+				"description": "When authentification failed",
+				"value": {
+					"code": 401,
+					"message": "Unauthorized",
+					"data": null,
+					"errors": null
+				}
+			},
+			"response404": {
+				"description": "Response data if data not available or not found",
 				"value": {
 					"code": 404,
 					"message": "Not Found",
@@ -403,7 +578,7 @@
 					"errors": null
 				}
 			},
-			"response-todo-single-200": {
+			"responseTodoSingle200": {
 				"description": "Example of single response data",
 				"value": {
 					"code": 200,
@@ -416,7 +591,7 @@
 					}
 				}
 			},
-			"response-todo-list-200": {
+			"responseTodoList200": {
 				"description": "Example of list response data",
 				"value": {
 					"code": 200,
@@ -436,34 +611,90 @@
 						}
 					]
 				}
+			},
+			"responseAuth200": {
+				"description": "Example of list response data",
+				"value": {
+					"code": 200,
+					"message": "OK",
+					"data": {
+						"token": "aaa.bbb.ccc"
+					},
+					"errors": null
+				}
 			}
 		},
 		"responses": {
-			"200-single-data-response": {
+			"singleData": {
 				"description": "Response data for single data operation",
 				"content": {
 					"application/json": {
 						"schema": {
-							"$ref": "#/components/schemas/response-todo-data"
+							"$ref": "#/components/schemas/responseTodo"
 						},
 						"examples": {
 							"success": {
-								"$ref": "#/components/examples/response-todo-single-200"
+								"$ref": "#/components/examples/responseTodoSingle200"
 							}
 						}
 					}
 				}
 			},
-			"404-data-not-found-response": {
+			"authSuccess": {
+				"description": "Response data for success authentification process",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/responseAuthSuccess"
+						},
+						"examples": {
+							"success": {
+								"$ref": "#/components/examples/responseAuth200"
+							}
+						}
+					}
+				}
+			},
+			"authFailed": {
+				"description": "Response if authentification process failed",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/responseAuthFailed"
+						},
+						"examples": {
+							"success": {
+								"$ref": "#/components/examples/responseAuth401"
+							}
+						}
+					}
+				}
+			},
+			"dataNotFound": {
 				"description": "Response if the operation data not found",
 				"content": {
 					"application/json": {
 						"schema": {
-							"$ref": "#/components/schemas/response-standard"
+							"$ref": "#/components/schemas/responseNotFound"
 						},
 						"examples": {
 							"success": {
-								"$ref": "#/components/examples/response-404"
+								"$ref": "#/components/examples/response404"
+							}
+						}
+					}
+				}
+			},
+			"emptyOrWrongJWT": {
+				"description": "Response if your JWT token not valid",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/responseMessageOnly"
+						},
+						"examples": {
+							"success": {
+								"$ref": "#/components/examples/response400"
 							}
 						}
 					}
