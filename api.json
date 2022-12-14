@@ -63,6 +63,41 @@
 				}
 			}
 		},
+		"/register": {
+			"post": {
+				"tags": [
+					"Authentification"
+				],
+				"description": "Register username to get auth token",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"$ref": "#/components/schemas/inputAuth"
+							},
+							"examples": {
+								"default": {
+									"description": "Default auth",
+									"value": {
+										"username": "admin",
+										"password": "admin"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/authSuccess"
+					},
+					"403": {
+						"$ref": "#/components/responses/registerFailed"
+					}
+				}
+			}
+		},
 		"/todo": {
 			"get": {
 				"security": [
@@ -102,7 +137,7 @@
 					"404": {
 						"$ref": "#/components/responses/dataNotFound"
 					},
-					"400":{
+					"400": {
 						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
@@ -148,7 +183,7 @@
 					"200": {
 						"$ref": "#/components/responses/singleData"
 					},
-					"400":{
+					"400": {
 						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
@@ -178,7 +213,7 @@
 					"404": {
 						"$ref": "#/components/responses/dataNotFound"
 					},
-					"400":{
+					"400": {
 						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
@@ -206,7 +241,7 @@
 					"404": {
 						"$ref": "#/components/responses/dataNotFound"
 					},
-					"400":{
+					"400": {
 						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
@@ -260,7 +295,7 @@
 					"404": {
 						"$ref": "#/components/responses/dataNotFound"
 					},
-					"400":{
+					"400": {
 						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
@@ -290,7 +325,7 @@
 					"404": {
 						"$ref": "#/components/responses/dataNotFound"
 					},
-					"400":{
+					"400": {
 						"$ref": "#/components/responses/emptyOrWrongJWT"
 					}
 				}
@@ -527,6 +562,43 @@
 					}
 				}
 			},
+			"responseRegisterFailed": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"code": {
+						"type": "integer",
+						"example": 409
+					},
+					"message": {
+						"type": "string",
+						"example": "Conflict"
+					},
+					"data": {
+						"type": "object",
+						"nullable": true,
+						"example": null
+					},
+					"errors": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"type": "object",
+							"properties": {
+								"title": {
+									"type": "string"
+								},
+								"message": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
 			"responseAuthFailed": {
 				"type": "object",
 				"additionalProperties": false,
@@ -631,6 +703,22 @@
 					},
 					"errors": null
 				}
+			},
+			"responseRegister403": {
+				"description": "Example of failed register",
+				"value": {
+					"code": 409,
+					"message": "Conflict",
+					"data": null,
+					"errors": [
+						{
+							"title": "username",
+							"messages": [
+								"is already exist"
+							]
+						}
+					]
+				}
 			}
 		},
 		"responses": {
@@ -659,6 +747,21 @@
 						"examples": {
 							"success": {
 								"$ref": "#/components/examples/responseAuth200"
+							}
+						}
+					}
+				}
+			},
+			"registerFailed": {
+				"description": "Response data if registration failed",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/responseRegisterFailed"
+						},
+						"examples": {
+							"success": {
+								"$ref": "#/components/examples/responseRegister403"
 							}
 						}
 					}

@@ -43,7 +43,7 @@ func TestAuth(t *testing.T) {
 				Password: "admin",
 			},
 			Exp: ExpectationResultTest{
-				ExpectedCode:        http.StatusCreated,
+				ExpectedCode:        http.StatusOK,
 				ExpectedContainData: "\"token\":\"",
 			},
 		},
